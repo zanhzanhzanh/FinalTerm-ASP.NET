@@ -5,7 +5,6 @@ using FinalTerm.Dto;
 using FinalTerm.Filters;
 using FinalTerm.Interfaces;
 using FinalTerm.Models;
-using FinalTerm.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -67,6 +66,11 @@ namespace FinalTerm.Controllers {
         [HttpDelete("{id}")]
         public async Task<ActionResult<ResponseObject<Product>>> DeleteProduct([FromRoute] Guid id) {
             return Ok(new ResponseObject<Product>(Ok().StatusCode, "Success", await _productRepository.Delete(id)));
+        }
+
+        [HttpGet("paging/{PageNumber}/{PageSize}/{SortType}/{SortField}")]
+        public async Task<ActionResult<ResponseObject<List<Product>>>> GetProductAndPaging([FromRoute] PagingDto pagingDto) {
+            return Ok(new ResponseObject<List<Product>>(Ok().StatusCode, "Success", await _productRepository.GetAllAndPaging(pagingDto)));
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using FinalTerm.Common.HandlingException;
+using FinalTerm.Dto;
 using FinalTerm.Interfaces;
 using FinalTerm.Models;
+using System.Linq.Expressions;
 using System.Net;
 
 namespace FinalTerm.Repository {
@@ -39,6 +41,40 @@ namespace FinalTerm.Repository {
             _context.Set<T>().Remove(foundEntity);
             await _context.SaveChangesAsync();
             return foundEntity;
+        }
+
+        public virtual async Task<List<T>> GetAllAndPaging(PagingDto pagingDto) {
+            IQueryable<T> query = _context.Set<T>();
+            
+            if (!string.IsNullOrWhiteSpace(pagingDto.SortField)) {
+                if(pagingDto.SortField == "default") {
+                    query = pagingDto.SortType == true ? query.OrderBy(x => x.Id) : query.OrderByDescending(x => x.Id);
+                } else {
+                    // Take T Properties
+                    var parameter = Expression.Parameter(typeof(T), "x");
+                    var property = Expression.Property(parameter, pagingDto.SortField);
+                    var lambda = Expression.Lambda(property, parameter);
+
+                    // Get Method OrderBy
+                    string methodName = pagingDto.SortType == true ? "OrderBy" : "OrderByDescending";
+                    var methodCall = Expression.Call(
+                        typeof(Queryable),methodName,
+                        new[] { typeof(T), property.Type },
+                        query.Expression,
+                        Expression.Quote(lambda)
+                    );
+
+                    // Create Query
+                    query = query.Provider.CreateQuery<T>(methodCall);
+                }
+            }
+
+            List<T> result = await query
+                .Skip((pagingDto.PageNumber - 1) * pagingDto.PageSize)
+                .Take(pagingDto.PageSize)
+                .ToListAsync();
+
+            return result;
         }
     }
 }
