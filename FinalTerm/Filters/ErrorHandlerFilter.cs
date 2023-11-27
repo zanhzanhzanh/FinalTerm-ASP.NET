@@ -16,7 +16,7 @@ namespace FinalTerm.Filters {
                 context.ExceptionHandled = true;
             }
 
-            if (exception is ArgumentException argumentException) {
+            else if (exception is ArgumentException argumentException) {
                 context.Result = new ObjectResult(new ProblemDetails {
                     Status = (int)HttpStatusCode.BadRequest,
                     Title = argumentException.Message,
