@@ -13,6 +13,13 @@ namespace FinalTerm.Startup {
             // Add services to the container.
             services.AddControllers();
 
+            // Add CORS
+            services.AddCors(options => {
+                options.AddPolicy(name: "MyPolicy", builder => {
+                    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader(); ;
+                });
+            });
+
             // Register Services for IServiceCollection
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
@@ -69,6 +76,8 @@ namespace FinalTerm.Startup {
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("MyPolicy");
 
             app.UseAuthentication();
 
