@@ -4,11 +4,13 @@ using FinalTerm.Dto;
 using FinalTerm.Filters;
 using FinalTerm.Interfaces;
 using FinalTerm.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinalTerm.Controllers {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
+    [Authorize]
     [ErrorHandlerFilter]
     public class OrderController : Controller {
         private readonly IOrderRepository _orderRepository;

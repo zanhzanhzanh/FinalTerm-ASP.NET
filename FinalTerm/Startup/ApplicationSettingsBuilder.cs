@@ -1,5 +1,11 @@
-﻿using FinalTerm.Interfaces;
+﻿using Amazon.S3;
+using FinalTerm.Interfaces;
 using FinalTerm.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 namespace FinalTerm.Startup {
     public static class ApplicationSettings {
@@ -22,9 +28,35 @@ namespace FinalTerm.Startup {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
 
+            //services.AddHttpContextAccessor();
+
             // Config Swagger
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(options => {
+                options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme {
+                    Description = "Standard Authorization header using the Bearer scheme (\"bearer {token}\")",
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                });
+
+                options.OperationFilter<SecurityRequirementsOperationFilter>();
+            });
+
+            // Config Authentication
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options => {
+                options.TokenValidationParameters = new TokenValidationParameters {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("AppSettings:Token").Value)),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            // Config AWS S3
+            services.AddDefaultAWSOptions(configuration.GetAWSOptions());
+            services.AddAWSService<IAmazonS3>();
 
             return services;
         }
@@ -37,6 +69,8 @@ namespace FinalTerm.Startup {
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

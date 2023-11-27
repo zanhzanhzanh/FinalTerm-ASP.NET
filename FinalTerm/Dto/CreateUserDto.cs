@@ -9,8 +9,5 @@ namespace FinalTerm.Dto {
 
         [Required]
         public string Fullname { get; set; }
-
-        [BindRequired]
-        public string Username { get; set; } = string.Empty;
     }
 }

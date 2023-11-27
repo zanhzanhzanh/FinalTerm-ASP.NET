@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace FinalTerm.Models {
     public class User : BaseModel {
@@ -14,9 +13,12 @@ namespace FinalTerm.Models {
         public string Fullname { get; set; }
 
         [Required]
-        public string Avatar { get; set; } = "path1.png";
+        public string Password { get; set; }
 
         [Required]
-        public bool IsBlocked { get; set; } = false;
+        public string Role { get; set; } = "User";
+
+        [Required]
+        public string Avatar { get; set; } = "path1.png";
     }
 }

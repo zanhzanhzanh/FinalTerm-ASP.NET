@@ -1,39 +1,32 @@
-﻿using FinalTerm.Interfaces;
+﻿using FinalTerm.Common.HandlingException;
+using FinalTerm.Interfaces;
 using FinalTerm.Models;
+using System.Net;
+using BC = BCrypt.Net.BCrypt;
 
 namespace FinalTerm.Repository {
     public class UserRepository : BaseRepository<User>, IUserRepository {
-        public UserRepository(DataContext context) : base(context) { }
+        private readonly DataContext _context;
 
-        //public async Task<List<User>> GetUser() {
-        //    return await _context.Users.ToListAsync();
-        //}
+        public UserRepository(DataContext context) : base(context) {
+            this._context = context;
+        }
 
-        //public async Task<User> GetUserById(long id) {
-        //    User? foundUser = await _context.Users.FindAsync(id);
+        public override async Task<User> Add(User user) {
+            if (await _context.Users.Where(x => x.Email == user.Email).FirstOrDefaultAsync() != null)
+                throw new ApiException((int)HttpStatusCode.BadRequest, "Email Exist");
 
-        //    return foundUser ?? throw new ApiException((int)HttpStatusCode.NotFound, $"{ this.GetType().Name } Not Found");
-        //}
+            user.Username = user.Email.Split("@")[0];
+            user.Password = BC.HashPassword("1");
 
-        //public async Task<User> AddUser(User user) {
-        //    _context.Users.Add(user);
-        //    await _context.SaveChangesAsync();
-        //    return user;
-        //}
+            return await base.Add(user);
+        }
 
-        //public async Task<User> UpdateUser(User user) {
-        //    _context.Entry(user).State = EntityState.Modified;
-        //    await _context.SaveChangesAsync();
-        //    return user;
-        //}
+        public async Task<User> GetByEmail(string email) {
+            User foundEntity = await _context.Users.Where(i => i.Email == email).FirstOrDefaultAsync() 
+                ?? throw new ApiException((int)HttpStatusCode.NotFound, "Not Found User"); ;
 
-        //public async Task<User> DeleteUser(long id) {
-        //    User foundUser = await _context.Users.FindAsync(id) ?? throw new ApiException((int)HttpStatusCode.NotFound, $"{ this.GetType().Name } Not Found");
-
-        //    _context.Users.Remove(foundUser);
-        //    await _context.SaveChangesAsync();
-
-        //    return foundUser;
-        //}
+            return foundEntity;
+        }
     }
 }

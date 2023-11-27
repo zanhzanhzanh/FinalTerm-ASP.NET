@@ -3,12 +3,14 @@ using FinalTerm.Common.HandlingException;
 using FinalTerm.Filters;
 using FinalTerm.Interfaces;
 using FinalTerm.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace FinalTerm.Controllers {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
+    [Authorize]
     [ErrorHandlerFilter]
     public class CustomerController : Controller {
         private readonly ICustomerRepository _customerRepository;

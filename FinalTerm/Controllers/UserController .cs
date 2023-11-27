@@ -5,10 +5,12 @@ using FinalTerm.Interfaces;
 using FinalTerm.Dto;
 using AutoMapper;
 using FinalTerm.Filters;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FinalTerm.Controllers {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
+    [Authorize(Roles = "Admin")]
     [ErrorHandlerFilter]
     public class UserController : Controller {
         private readonly IUserRepository _userRepository;
@@ -29,12 +31,12 @@ namespace FinalTerm.Controllers {
             return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.GetById(id)));
         }
 
-        [HttpPost]
-        public async Task<ActionResult<ResponseObject<User>>> AddUser([FromBody] CreateUserDto rawUser) {
-            User user = _mapper.Map<User>(rawUser);
+        //[HttpPost]
+        //public async Task<ActionResult<ResponseObject<User>>> AddUser([FromBody] CreateUserDto rawUser) {
+        //    User user = _mapper.Map<User>(rawUser);
 
-            return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.Add(user)));
-        }
+        //    return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.Add(user)));
+        //}
 
         [HttpPut("{id}")]
         public async Task<ActionResult<ResponseObject<User>>> UpdateUser([FromRoute] Guid id, [FromBody] UpdateUserDto rawUser) {
