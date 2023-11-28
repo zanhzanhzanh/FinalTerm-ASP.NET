@@ -3,7 +3,6 @@ using FinalTerm.Common.HandlingException;
 using FinalTerm.Dto;
 using FinalTerm.Interfaces;
 using FinalTerm.Models;
-using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace FinalTerm.Repository {
@@ -31,12 +30,18 @@ namespace FinalTerm.Repository {
         }
 
         public async Task<Order> AddTransaction(CreateOrderDto rawOrder) {
+            Customer takeRawCustomer = new Customer() {
+                Phone = rawOrder.Phone,
+                Name = rawOrder.Name,
+                Address = rawOrder.Address,
+            };
+
             // Validation for Customer
-            Customer? foundCustomer = await _customerRepository.GetByPhone(rawOrder.Customer.Phone);
+            Customer? foundCustomer = await _customerRepository.GetByPhone(takeRawCustomer.Phone);
             // if not found Customer -> create Customer
             if (foundCustomer == null) {
                 // Must have Phone and Name
-                if (rawOrder.Customer.Name == "") throw new ApiException((int) HttpStatusCode.UnprocessableEntity, "Field Name must not empty");
+                if (takeRawCustomer.Name == "") throw new ApiException((int) HttpStatusCode.UnprocessableEntity, "Field Name must not empty");
             }
 
             // Validation for OrderItems And Product
@@ -64,7 +69,7 @@ namespace FinalTerm.Repository {
             // Check if not receive enough money
             if (order.CashBackAmount < 0) throw new ApiException((int)HttpStatusCode.UnprocessableEntity, "Customer doesn't give enough money");
 
-            order.Customer = foundCustomer ?? await _customerRepository.Add(_mapper.Map<Customer>(rawOrder.Customer));
+            order.Customer = foundCustomer ?? await _customerRepository.Add(_mapper.Map<Customer>(takeRawCustomer));
 
             return await Add(order);
         }

@@ -3,6 +3,7 @@ using FinalTerm.Common.HandlingException;
 using FinalTerm.Filters;
 using FinalTerm.Interfaces;
 using FinalTerm.Models;
+using FinalTerm.Repository;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -28,6 +29,11 @@ namespace FinalTerm.Controllers {
                 .ThenInclude(i => i.OrderItems)
                 .ThenInclude(i => i.Product)
                 .ToListAsync()));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ResponseObject<Customer>>> GetCustomerById([FromRoute] Guid id) {
+            return Ok(new ResponseObject<Customer>(Ok().StatusCode, "Success", await _customerRepository.GetById(id)));
         }
 
         [HttpGet("{phone:regex(^\\d+$)}")]

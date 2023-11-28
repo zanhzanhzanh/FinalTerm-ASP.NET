@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 
 namespace FinalTerm.Dto {
     public class CreateOrderDto {
@@ -6,8 +7,18 @@ namespace FinalTerm.Dto {
         [Range(0, Int32.MaxValue)]
         public int ReceivedAmount { get; set; }
 
+        //[Required]
+        //public CreateCustomerDto Customer { get; set; }
+
         [Required]
-        public CreateCustomerDto Customer { get; set; }
+        [Phone]
+        public string Phone { get; set; }
+
+        [BindRequired]
+        public string Name { get; set; } = string.Empty;
+
+        [BindRequired]
+        public string Address { get; set; } = string.Empty;
 
         [Required]
         public List<CreateOrderItemDto> OrderItems { get; set; }

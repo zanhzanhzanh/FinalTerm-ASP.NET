@@ -55,8 +55,8 @@ namespace FinalTerm.Controllers {
             Product product = await _productRepository.GetById(id);
 
             // Check Barcode Exist
-            if (rawProduct.Barcode != null && await _productRepository.GetByBarcode(rawProduct.Barcode) != null)
-                throw new ApiException((int)HttpStatusCode.NotFound, $"Barcode Exist");
+            //if (rawProduct.Barcode != null && await _productRepository.GetByBarcode(rawProduct.Barcode) != null)
+            //    throw new ApiException((int)HttpStatusCode.NotFound, $"Barcode Exist");
 
             // foundProduct in EntityState.Modified
             _mapper.Map(rawProduct, product);
