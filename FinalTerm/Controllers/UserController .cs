@@ -6,11 +6,12 @@ using FinalTerm.Dto;
 using AutoMapper;
 using FinalTerm.Filters;
 using Microsoft.AspNetCore.Authorization;
+using BC = BCrypt.Net.BCrypt;
 
 namespace FinalTerm.Controllers {
     [ApiController]
     [Route("api/v1/[controller]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [ErrorHandlerFilter]
     public class UserController : Controller {
         private readonly IUserRepository _userRepository;
@@ -31,21 +32,24 @@ namespace FinalTerm.Controllers {
             return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.GetById(id)));
         }
 
-        //[HttpPost]
-        //public async Task<ActionResult<ResponseObject<User>>> AddUser([FromBody] CreateUserDto rawUser) {
-        //    User user = _mapper.Map<User>(rawUser);
+        [HttpPut("avatar/{id}")]
+        public async Task<ActionResult<ResponseObject<User>>> UpdateAvatarUser([FromRoute] Guid id) {
+            User user = await _userRepository.GetById(id);
+            user.UpdatedAt = DateTime.Now;
 
-        //    return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.Add(user)));
-        //}
+            return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.UpdateAvatar(user)));
+        }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<ResponseObject<User>>> UpdateUser([FromRoute] Guid id, [FromBody] UpdateUserDto rawUser) {
             // user in EntityState.Unchanged
             User user = await _userRepository.GetById(id);
 
+            if (rawUser.Password != null) { rawUser.Password = BC.HashPassword(rawUser.Password); }
+
             // foundUser in EntityState.Modified
             _mapper.Map(rawUser, user);
-            //user.UpdatedAt = DateTime.Now;
+            user.UpdatedAt = DateTime.Now;
 
             return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.Update(user)));
         }

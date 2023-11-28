@@ -12,7 +12,7 @@ using System.Net;
 namespace FinalTerm.Controllers {
     [ApiController]
     [Route("api/v1/[controller]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [ErrorHandlerFilter]
     public class ProductController : Controller {
         private readonly IProductRepository _productRepository;

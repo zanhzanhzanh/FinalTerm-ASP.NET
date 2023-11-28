@@ -1,4 +1,5 @@
 ﻿using Amazon.S3;
+using FinalTerm.Controllers;
 using FinalTerm.Interfaces;
 using FinalTerm.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -26,6 +27,7 @@ namespace FinalTerm.Startup {
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ICustomerRepository, CustomerRepository>();
             services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+            services.AddScoped<BucketsRepository>();
 
             // Config AutoMapper
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -34,8 +36,6 @@ namespace FinalTerm.Startup {
             services.AddDbContext<DataContext>(options => {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
-
-            //services.AddHttpContextAccessor();
 
             // Config Swagger
             services.AddEndpointsApiExplorer();

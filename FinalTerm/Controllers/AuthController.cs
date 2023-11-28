@@ -48,10 +48,19 @@ namespace FinalTerm.Controllers {
             return Ok(new ResponseObject<string>(Ok().StatusCode, "Success", token));
         }
 
+        [Authorize]
+        [HttpGet("{token}")]
+        public async Task<ActionResult<ResponseObject<User>>> GetUserByToken([FromRoute] string token) {
+            JwtSecurityToken jwtSecurityToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
+            string id = jwtSecurityToken.Claims.First(x => x.Type == "Id").Value;
+            return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.GetById(new Guid(id))));
+        }
+
         private string CreateToken(User user) {
             List<Claim> claims = new() {
                 new Claim(ClaimTypes.Name, user.Fullname),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim("Id", user.Id.ToString()),
             };
 
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
