@@ -36,6 +36,11 @@ namespace FinalTerm.Controllers {
             return Ok(new ResponseObject<Order>(Ok().StatusCode, "Success", await _orderRepository.AddTransaction(rawOrder)));
         }
 
+        [HttpGet("{phone:regex(^\\d+$)}")]
+        public async Task<ActionResult<ResponseObject<List<Order>>>> GetOrderByPhone([FromRoute] string phone) {
+            return Ok(new ResponseObject<List<Order>>(Ok().StatusCode, "Success", await _orderRepository.GetOrdersByPhone(phone)));
+        }
+
         //[HttpPut("{id}")]
         //public async Task<ActionResult<ResponseObject<Order>>> UpdateOrder([FromRoute] Guid id, [FromBody] UpdateOrderDto rawOrder) {
         //    // order in EntityState.Unchanged

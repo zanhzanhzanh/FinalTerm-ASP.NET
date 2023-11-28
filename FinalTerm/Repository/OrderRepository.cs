@@ -3,18 +3,31 @@ using FinalTerm.Common.HandlingException;
 using FinalTerm.Dto;
 using FinalTerm.Interfaces;
 using FinalTerm.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace FinalTerm.Repository {
     public class OrderRepository : BaseRepository<Order>, IOrderRepository {
         private readonly ICustomerRepository _customerRepository;
         private readonly IProductRepository _productRepository;
+        private readonly DataContext _context;
         private readonly IMapper _mapper;
 
         public OrderRepository(DataContext context, ICustomerRepository customerRepository, IProductRepository productRepository, IMapper mapper) : base(context) {
             this._customerRepository = customerRepository;
             this._productRepository = productRepository;
+            this._context = context;
             this._mapper = mapper;
+        }
+
+        public async Task<List<Order>> GetOrdersByPhone(string phone) {
+            List<Order> foundEntity = await _context.Orders
+                 .Include(i => i.OrderItems)
+                 .ThenInclude(i => i.Product)
+                 .Where(i => i.Customer.Phone == phone)
+                 .ToListAsync();
+
+            return foundEntity;
         }
 
         public async Task<Order> AddTransaction(CreateOrderDto rawOrder) {

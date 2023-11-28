@@ -49,9 +49,9 @@ namespace FinalTerm.Controllers {
         }
 
         [Authorize]
-        [HttpGet("{token}")]
-        public async Task<ActionResult<ResponseObject<User>>> GetUserByToken([FromRoute] string token) {
-            JwtSecurityToken jwtSecurityToken = new JwtSecurityTokenHandler().ReadJwtToken(token);
+        [HttpGet]
+        public async Task<ActionResult<ResponseObject<User>>> GetUserByToken([FromHeader(Name = "Authorization")] string token) {
+            JwtSecurityToken jwtSecurityToken = new JwtSecurityTokenHandler().ReadJwtToken(token[7..]);
             string id = jwtSecurityToken.Claims.First(x => x.Type == "Id").Value;
             return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.GetById(new Guid(id))));
         }
