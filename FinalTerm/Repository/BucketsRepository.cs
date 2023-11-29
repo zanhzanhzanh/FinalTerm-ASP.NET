@@ -12,7 +12,7 @@ namespace FinalTerm.Repository {
         }
 
         public string GeneratePreSignedUrl(string url) {
-            string[] getStr = url.Split("/");
+            string[] getStr = url.Split("%2F");
             string fileName = getStr[getStr.Length - 1];
 
             var request = new GetPreSignedUrlRequest {
