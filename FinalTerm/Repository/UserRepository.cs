@@ -39,12 +39,12 @@ namespace FinalTerm.Repository {
             return foundEntity;
         }
 
-        public async Task<User> UpdateAvatar(User entity) {
+        public async Task<string> UpdateAvatar(User entity) {
             entity.Avatar = "https://s3." +
                             _configuration.GetSection("AWS:Region").Value +
                             ".amazonaws.com/" + _configuration.GetSection("AWS:BucketName").Value +
                             "/" + DateTime.Now.ToString("yyyy-MM-ddTHH-mm-ss-fffffff") + "_avatar.png";
-            return await Update(entity);
+            return (await Update(entity)).Avatar;
         }
 
         public async Task<User> GetByEmail(string email) {

@@ -11,7 +11,10 @@ namespace FinalTerm.Repository {
             _s3Client = s3Client;
         }
 
-        public string GeneratePreSignedUrl(string fileName) {
+        public string GeneratePreSignedUrl(string url) {
+            string[] getStr = url.Split("/");
+            string fileName = getStr[getStr.Length - 1];
+
             var request = new GetPreSignedUrlRequest {
                 BucketName = _configuration.GetSection("AWS:BucketName").Value,
                 Key = fileName,

@@ -7,6 +7,7 @@ using AutoMapper;
 using FinalTerm.Filters;
 using Microsoft.AspNetCore.Authorization;
 using BC = BCrypt.Net.BCrypt;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace FinalTerm.Controllers {
     [ApiController]
@@ -32,12 +33,15 @@ namespace FinalTerm.Controllers {
             return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.GetById(id)));
         }
 
-        [HttpPut("avatar/{id}")]
-        public async Task<ActionResult<ResponseObject<User>>> UpdateAvatarUser([FromRoute] Guid id) {
-            User user = await _userRepository.GetById(id);
+        [HttpPut("avatar")]
+        public async Task<ActionResult<ResponseObject<string>>> UpdateAvatarUser([FromHeader(Name = "Authorization")] string token) {
+            JwtSecurityToken jwtSecurityToken = new JwtSecurityTokenHandler().ReadJwtToken(token[7..]);
+            string id = jwtSecurityToken.Claims.First(x => x.Type == "Id").Value;
+
+            User user = await _userRepository.GetById(new Guid(id));
             user.UpdatedAt = DateTime.Now;
 
-            return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.UpdateAvatar(user)));
+            return Ok(new ResponseObject<string>(Ok().StatusCode, "Success", await _userRepository.UpdateAvatar(user)));
         }
 
         [HttpPut("{id}")]

@@ -18,9 +18,9 @@ namespace FinalTerm.Controllers {
         }
 
         [Authorize]
-        [HttpGet("~/api/v1/s3/presigned-url/{fileName}")]
-        public async Task<ActionResult<ResponseObject<string>>> GetPreSignedUrl([FromRoute] string fileName) {
-            return Ok(new ResponseObject<string>(200, "Success", _bucketsRepository.GeneratePreSignedUrl(fileName)));
+        [HttpGet("~/api/v1/s3/presigned-url/{url}")]
+        public async Task<ActionResult<ResponseObject<string>>> GetPreSignedUrl([FromRoute] string url) {
+            return Ok(new ResponseObject<string>(200, "Success", _bucketsRepository.GeneratePreSignedUrl(url)));
         }
 
         //[HttpGet("get-all")]
