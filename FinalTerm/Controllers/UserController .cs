@@ -62,12 +62,12 @@ namespace FinalTerm.Controllers {
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ResponseObject<User>>> BlockUser([FromRoute] Guid id, [FromBody] bool isBlocked) {
+        public async Task<ActionResult<ResponseObject<User>>> BlockUser([FromRoute] Guid id, [FromBody] UpdateBlockUserDto updateBlockUserDto) {
             // user in EntityState.Unchanged
             User user = await _userRepository.GetById(id);
 
             // foundUser in EntityState.Modified
-            user.IsBlocked = isBlocked;
+            user.IsBlocked = updateBlockUserDto.IsBlocked;
             user.UpdatedAt = DateTime.Now;
 
             return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.Update(user)));
