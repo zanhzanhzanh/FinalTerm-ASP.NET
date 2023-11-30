@@ -19,6 +19,9 @@ namespace FinalTerm.Models {
         public string Role { get; set; } = "User";
 
         [Required]
+        public bool IsBlocked { get; set; } = false;
+
+        [Required]
         public string Avatar { get; set; } = "path1.png";
     }
 }

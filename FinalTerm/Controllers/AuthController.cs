@@ -39,6 +39,7 @@ namespace FinalTerm.Controllers {
             User user = await _userRepository.GetByEmail(rawUser.Email);
 
             if (!BC.Verify(rawUser.Password, user.Password)) return BadRequest(new ResponseObject<string>(BadRequest().StatusCode, "Wrong Password", ""));
+            if (user.IsBlocked) return BadRequest(new ResponseObject<string>(BadRequest().StatusCode, "User Blocked", ""));
 
             string token = CreateToken(user);
 

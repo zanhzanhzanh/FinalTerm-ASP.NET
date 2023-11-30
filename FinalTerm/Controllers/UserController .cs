@@ -44,15 +44,30 @@ namespace FinalTerm.Controllers {
             return Ok(new ResponseObject<string>(Ok().StatusCode, "Success", await _userRepository.UpdateAvatar(user)));
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<ResponseObject<User>>> UpdateUser([FromRoute] Guid id, [FromBody] UpdateUserDto rawUser) {
+        [HttpPut]
+        public async Task<ActionResult<ResponseObject<User>>> UpdateUser([FromHeader(Name = "Authorization")] string token, [FromBody] UpdateUserDto rawUser) {
+            JwtSecurityToken jwtSecurityToken = new JwtSecurityTokenHandler().ReadJwtToken(token[7..]);
+            string id = jwtSecurityToken.Claims.First(x => x.Type == "Id").Value;
+
             // user in EntityState.Unchanged
-            User user = await _userRepository.GetById(id);
+            User user = await _userRepository.GetById(new Guid(id));
 
             if (rawUser.Password != null) { rawUser.Password = BC.HashPassword(rawUser.Password); }
 
             // foundUser in EntityState.Modified
             _mapper.Map(rawUser, user);
+            user.UpdatedAt = DateTime.Now;
+
+            return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.Update(user)));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ResponseObject<User>>> BlockUser([FromRoute] Guid id, [FromBody] bool isBlocked) {
+            // user in EntityState.Unchanged
+            User user = await _userRepository.GetById(id);
+
+            // foundUser in EntityState.Modified
+            user.IsBlocked = isBlocked;
             user.UpdatedAt = DateTime.Now;
 
             return Ok(new ResponseObject<User>(Ok().StatusCode, "Success", await _userRepository.Update(user)));
